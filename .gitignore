@@ -1,0 +1,21 @@
+# dependencies and build output
+node_modules
+site/dist
+.vercel
+.netlify
+.wrangler
+
+# Remotion renders (re-create with npm run render / render:film)
+out
+
+# audio masters are large; the encoded mp3s live in site/public/audio
+assets-src/*.wav
+
+# local tooling / editor state
+.remember
+.claude
+*.log
+.env
+.env.*
+.DS_Store
+Thumbs.db

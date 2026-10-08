@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Velluto Coffee Atelier</title>
+    <meta name="description" content="Velluto: slow coffee, poured like velvet. Single-estate beans, hand roasted on a 1962 drum, poured one cup at a time in the Old Harbour Quarter." />
+    <meta name="theme-color" content="#0b0705" />
+    <meta property="og:title" content="Velluto Coffee Atelier" />
+    <meta property="og:description" content="Slow coffee, poured like velvet. A forty-second film about one cup of coffee." />
+    <meta property="og:image" content="/media/film-poster.jpg" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Manrope:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preload" as="image" href="/media/film-poster.jpg" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <video autoplay muted loop playsinline poster="/media/hero-poster.jpg" style="position:fixed;inset:0;width:100%;height:100%;object-fit:cover">
+        <source src="/media/hero.webm" type="video/webm" />
+        <source src="/media/hero.mp4" type="video/mp4" />
+      </video>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
