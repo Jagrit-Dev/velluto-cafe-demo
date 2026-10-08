@@ -8,6 +8,8 @@ export const PLAYLIST = [
 ] as const;
 
 const VOLUME = 0.8;
+/** events browsers accept as the interaction that unlocks sound */
+const GESTURES = ["pointerdown", "keydown", "touchend", "click"] as const;
 const XFADE = 3; // seconds of overlap between tracks
 
 /**
@@ -106,7 +108,20 @@ export const useMusic = () => {
     };
   }, [advance]);
 
-  /** Must be called from a user gesture (browsers block audible autoplay). */
+  /*
+   * Music is ON by default. Browsers refuse sound until the visitor interacts with the page,
+   * so when that happens the player stays "on" (record out and spinning) and is *armed*: the
+   * very first click, tap or key press anywhere starts the sound, without also stopping the
+   * auto tour. Scrolling alone never counts as an interaction for browsers.
+   */
+  const armed = useRef(false);
+  const userPaused = useRef(false);
+  const unlockRef = useRef<(e: Event) => void>(() => undefined);
+  const disarm = useCallback(() => {
+    armed.current = false;
+    GESTURES.forEach((ev) => window.removeEventListener(ev, unlockRef.current, true));
+  }, []);
+
   const play = useCallback(
     (fromStart = false) => {
       const a = decks.current[active.current];
@@ -116,16 +131,31 @@ export const useMusic = () => {
       if (fromStart) a.currentTime = 0;
       if (a.paused) a.volume = 0;
       a.play()
-        .then(() => fade(a, VOLUME, 900))
+        .then(() => {
+          disarm();
+          fade(a, VOLUME, 1500);
+        })
         .catch(() => {
-          wants.current = false;
-          setPlaying(false);
+          if (userPaused.current || !wants.current) return;
+          // blocked until the visitor interacts: stay on, start at the first gesture
+          armed.current = true;
+          GESTURES.forEach((ev) => window.addEventListener(ev, unlockRef.current, true));
         });
     },
-    [fade],
+    [fade, disarm],
   );
 
+  unlockRef.current = (e: Event) => {
+    if (!armed.current) return;
+    // a click on the record player is handled by its own toggle (which starts the sound)
+    if ((e.target as Element | null)?.closest?.(".vinyl")) return;
+    disarm();
+    if (e.type === "pointerdown") spareEvent(e);
+    play();
+  };
+
   const pause = useCallback(() => {
+    disarm();
     wants.current = false;
     fading.current = false; // an interrupted crossfade must not block the next one
     setPlaying(false); // the record stops and slides home right away; audio fades out under it
@@ -135,43 +165,25 @@ export const useMusic = () => {
         if (!wants.current) a.pause();
       });
     });
-  }, [fade]);
+  }, [fade, disarm]);
 
-  const userPaused = useRef(false);
   const toggle = useCallback(() => {
+    // still waiting for a first gesture: this click is it, so start the sound rather than stop
+    if (armed.current) {
+      disarm();
+      play();
+      return;
+    }
     userPaused.current = wants.current;
     if (wants.current) pause();
     else play();
-  }, [play, pause]);
+  }, [play, pause, disarm]);
 
-  // Start with the page. Browsers usually block sound until the visitor interacts, so if the
-  // first attempt is refused, the first click, tap or key press anywhere starts it instead
-  // (without also stopping the auto tour). Scrolling alone doesn't count as a gesture.
+  // start with the page
   useEffect(() => {
-    const events = ["pointerdown", "keydown", "touchend"] as const;
-    const stop = () => events.forEach((ev) => window.removeEventListener(ev, unlock, true));
-    const unlock = (e: Event) => {
-      stop();
-      // a click on the record player is handled by its own toggle
-      if ((e.target as Element | null)?.closest?.(".vinyl")) return;
-      if (wants.current || userPaused.current) return;
-      if (e.type === "pointerdown") spareEvent(e);
-      play();
-    };
-    const a = decks.current[active.current];
-    wants.current = true;
-    setPlaying(true);
-    a.volume = 0;
-    a.play()
-      .then(() => fade(a, VOLUME, 1500))
-      .catch(() => {
-        if (userPaused.current) return;
-        wants.current = false;
-        setPlaying(false);
-        events.forEach((ev) => window.addEventListener(ev, unlock, true));
-      });
-    return stop;
-  }, [play, fade]);
+    play(true);
+    return disarm;
+  }, [play, disarm]);
 
   return { playing, available, play, pause, toggle, track: PLAYLIST[track], trackIndex: track };
 };
