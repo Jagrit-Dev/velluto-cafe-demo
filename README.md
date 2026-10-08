@@ -85,19 +85,19 @@ looping forever with a 3 s crossfade, independent of the tour. Masters live in `
 Each is trimmed at its silent tail, loudness-matched to -16 LUFS, 1.2 s fade-out, 192 kbps.
 The record-player toggle (bottom right) shows the current track; edit `PLAYLIST` in `site/src/music.ts`.
 
-## Deploy (Cloudflare Pages)
+## Deploy (Cloudflare Workers, auto-deploy from GitHub)
 
-Live: **https://velluto-cafe-demo.pages.dev**
+Live: **https://velluto-cafe-demo.jagritmondal-csbs.workers.dev**
 
-`site/` is self-contained: the rendered media is committed under `site/public/`, so no build
-step needs ffmpeg or Remotion. `site/public/_headers` gives `/media`, `/audio` and `/assets` a
-one-year immutable cache.
+The Cloudflare project `velluto-cafe-demo` is connected to this repo: every push to `main` builds
+and deploys automatically (Workers Builds). It runs from the repo root:
 
-```bash
-npm run deploy     # from the repo root: builds site/ and uploads site/dist to Pages
-```
+- build: `npm run build` (installs `site/` dependencies, then `vite build` into `site/dist`)
+- deploy: `npx wrangler deploy` (`wrangler.jsonc` serves `site/dist` as static assets)
 
-This uses the Wrangler CLI (`npx wrangler login` once per machine). The project is a direct-upload
-Pages project, so pushing to GitHub does not redeploy by itself; run `npm run deploy` after pushing.
+`site/public/_headers` gives `/media`, `/audio` and `/assets` a one-year immutable cache. The rendered
+media is committed under `site/public/`, so no build step needs ffmpeg or Remotion.
+
+Manual deploy from this machine (after `npx wrangler login`): `npm run deploy`.
 
 `site/vercel.json` is kept too, so the same folder also deploys to Vercel (Root Directory = `site`).

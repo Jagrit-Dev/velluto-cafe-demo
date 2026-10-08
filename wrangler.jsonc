@@ -1,0 +1,10 @@
+// Cloudflare Workers static-assets deploy for the website (site/).
+// Workers Builds runs `npm run build` (root script builds site/) then `npx wrangler deploy`.
+{
+  "name": "velluto-cafe-demo",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    // _headers in this folder sets the long-term caching for /media, /audio and /assets
+    "directory": "./site/dist"
+  }
+}

@@ -4,9 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "npm --prefix site run dev",
-    "build": "npm --prefix site run build",
+    "build": "npm --prefix site install --no-audit --no-fund && npm --prefix site run build",
     "preview": "npm --prefix site run preview",
-    "deploy": "npm --prefix site run deploy",
+    "deploy": "npm run build && npx wrangler@4 deploy",
     "studio": "remotion studio",
     "render": "remotion render HeroLoop out/hero.mp4 --crf=14",
     "render:film": "remotion render Film out/film.mp4 --crf=14",
