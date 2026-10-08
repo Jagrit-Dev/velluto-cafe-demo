@@ -6,6 +6,7 @@
     "dev": "npm --prefix site run dev",
     "build": "npm --prefix site run build",
     "preview": "npm --prefix site run preview",
+    "deploy": "npm --prefix site run deploy",
     "studio": "remotion studio",
     "render": "remotion render HeroLoop out/hero.mp4 --crf=14",
     "render:film": "remotion render Film out/film.mp4 --crf=14",

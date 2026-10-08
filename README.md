@@ -85,12 +85,19 @@ looping forever with a 3 s crossfade, independent of the tour. Masters live in `
 Each is trimmed at its silent tail, loudness-matched to -16 LUFS, 1.2 s fade-out, 192 kbps.
 The record-player toggle (bottom right) shows the current track; edit `PLAYLIST` in `site/src/music.ts`.
 
-## Deploy to Vercel
+## Deploy (Cloudflare Pages)
 
-`site/` is self-contained (`vercel.json` sets the Vite framework, `dist` output and immutable caching
-for `/media`, `/audio`, `/assets`).
+Live: **https://velluto-cafe-demo.pages.dev**
 
-- **Git:** push the repo, import it in Vercel, set **Root Directory = `site`**. Defaults do the rest.
-- **CLI:** `cd site && npx vercel` (preview) then `npx vercel --prod`.
+`site/` is self-contained: the rendered media is committed under `site/public/`, so no build
+step needs ffmpeg or Remotion. `site/public/_headers` gives `/media`, `/audio` and `/assets` a
+one-year immutable cache.
 
-The media files are committed under `site/public/media`, so no build step needs ffmpeg or Remotion.
+```bash
+npm run deploy     # from the repo root: builds site/ and uploads site/dist to Pages
+```
+
+This uses the Wrangler CLI (`npx wrangler login` once per machine). The project is a direct-upload
+Pages project, so pushing to GitHub does not redeploy by itself; run `npm run deploy` after pushing.
+
+`site/vercel.json` is kept too, so the same folder also deploys to Vercel (Root Directory = `site`).
