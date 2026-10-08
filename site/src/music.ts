@@ -27,6 +27,7 @@ export const useMusic = () => {
   const [playing, setPlaying] = useState(false);
   const [available, setAvailable] = useState(true);
   const [track, setTrack] = useState(0);
+  const [waiting, setWaiting] = useState(false); // on, but the browser is holding sound until a gesture
 
   // timer-driven (not rAF) so fades still finish in background tabs / minimised windows
   const fade = useCallback((a: HTMLAudioElement, to: number, ms: number, done?: () => void) => {
@@ -110,7 +111,8 @@ export const useMusic = () => {
 
   /*
    * Music is ON by default. Browsers refuse sound until the visitor interacts with the page,
-   * so when that happens the player stays "on" (record out and spinning) and is *armed*: the
+   * so when that happens the player stays "on" but shows it is waiting (record out, not spinning,
+ * "Tap for sound") and is *armed*: the
    * very first click, tap or key press anywhere starts the sound, without also stopping the
    * auto tour. Scrolling alone never counts as an interaction for browsers.
    */
@@ -119,6 +121,7 @@ export const useMusic = () => {
   const unlockRef = useRef<(e: Event) => void>(() => undefined);
   const disarm = useCallback(() => {
     armed.current = false;
+    setWaiting(false);
     GESTURES.forEach((ev) => window.removeEventListener(ev, unlockRef.current, true));
   }, []);
 
@@ -139,6 +142,7 @@ export const useMusic = () => {
           if (userPaused.current || !wants.current) return;
           // blocked until the visitor interacts: stay on, start at the first gesture
           armed.current = true;
+          setWaiting(true);
           GESTURES.forEach((ev) => window.addEventListener(ev, unlockRef.current, true));
         });
     },
@@ -185,7 +189,7 @@ export const useMusic = () => {
     return disarm;
   }, [play, disarm]);
 
-  return { playing, available, play, pause, toggle, track: PLAYLIST[track], trackIndex: track };
+  return { playing, waiting, available, play, pause, toggle, track: PLAYLIST[track], trackIndex: track };
 };
 
 const load = (a: HTMLAudioElement, index: number) => {

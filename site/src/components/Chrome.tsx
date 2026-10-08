@@ -116,10 +116,12 @@ export const MusicButton = ({ music }: { music: Music }) => {
     const id = window.setTimeout(() => setSwapping(false), 750);
     return () => window.clearTimeout(id);
   }, [trackIndex]);
-  const label = `${music.playing ? "Pause" : "Play"} music: ${track.title}`;
+  const label = music.waiting
+    ? `Turn on sound: ${track.title}`
+    : `${music.playing ? "Pause" : "Play"} music: ${track.title}`;
   return (
     <button
-      className={`vinyl ${music.playing ? "is-on" : ""} ${music.playing && !swapping ? "is-out" : ""}`}
+      className={`vinyl ${music.playing && !music.waiting ? "is-on" : ""} ${music.playing && !swapping ? "is-out" : ""} ${music.waiting ? "is-waiting" : ""}`}
       data-tour-ui
       onClick={music.toggle}
       aria-pressed={music.playing}
@@ -131,6 +133,13 @@ export const MusicButton = ({ music }: { music: Music }) => {
           <span className="vinyl__label" />
         </span>
         <span className="vinyl__sheen" />
+      </span>
+      <span className="vinyl__hint" aria-hidden="true">
+        <svg viewBox="0 0 16 16" width="11" height="11">
+          <path d="M3 6h2.5L9 3v10L5.5 10H3z" fill="currentColor" />
+          <path d="M11 5.5a3.5 3.5 0 0 1 0 5M12.6 3.8a6 6 0 0 1 0 8.4" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+        </svg>
+        Tap for sound
       </span>
       <span className="vinyl__sleeve" aria-hidden="true">
         <span className="vinyl__art" />

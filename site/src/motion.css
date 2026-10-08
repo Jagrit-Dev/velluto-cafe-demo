@@ -590,3 +590,53 @@
     animation: none;
   }
 }
+
+/* sound is on but the browser is waiting for a first click/tap: say so instead of faking playback */
+.vinyl__hint {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  background: linear-gradient(135deg, var(--gold-2), var(--gold));
+  box-shadow: 0 8px 22px -8px rgba(214, 150, 78, 0.7);
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+}
+.vinyl.is-waiting .vinyl__hint {
+  opacity: 1;
+  transform: none;
+  animation: hint-bob 2.4s var(--ease) 0.6s infinite;
+}
+@keyframes hint-bob {
+  50% {
+    transform: translateY(-3px);
+  }
+}
+.vinyl.is-waiting .vinyl__sleeve {
+  animation: sleeve-glow 2.4s ease-in-out infinite;
+}
+@keyframes sleeve-glow {
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(236, 189, 130, 0.7),
+      0 0 18px 2px rgba(214, 150, 78, 0.45),
+      0 10px 22px -10px rgba(0, 0, 0, 0.9);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vinyl.is-waiting .vinyl__hint,
+  .vinyl.is-waiting .vinyl__sleeve {
+    animation: none;
+  }
+}
