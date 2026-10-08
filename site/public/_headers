@@ -1,0 +1,8 @@
+# Cloudflare Pages headers (the same caching vercel.json sets up on Vercel).
+# Media, audio and hashed build assets never change under the same name: cache for a year.
+/media/*
+  Cache-Control: public, max-age=31536000, immutable
+/audio/*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
